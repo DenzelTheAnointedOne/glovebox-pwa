@@ -40,8 +40,6 @@ python3 -m http.server 8080      # or: npx serve .
 
 Open http://localhost:8080. To test on a phone, deploy it (below), because phones need HTTPS.
 
-## Deploy (any static HTTPS host)
-
 **GitHub Pages:** push this folder to a repo, then go to Settings → Pages → Deploy from a branch → `main` / root.
 Your app will be at `https://<username>.github.io/<repo>/`. All paths are relative, so a subfolder URL works.
 
@@ -65,9 +63,3 @@ If you add a new file, also add it to the `SHELL` list in `sw.js` so it's availa
 - On iOS, push notifications only work after the app is added to the home screen (iOS 16.4+). This version doesn't use them yet.
 - Safari can clear website data for sites you haven't used in a while. Home-screen apps are exempt, so encourage users to install.
 - Call and Text buttons use `tel:` and `sms:` links, which open the phone and Messages apps.
-
-## Next steps
-
-- Map of safe parking lots, gyms, showers and libraries
-- Optional account with cloud sync so data moves between devices
-- Reminder notifications for the nightly routine and morning check-in
