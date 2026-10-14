@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Glovebox</title>
+<meta name="description" content="Plan and manage the move from a home into living in your car.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#eef0f3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#10151c" media="(prefers-color-scheme: dark)">
+<!-- iOS home-screen app -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Glovebox">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preload" href="fonts/archivo-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/atkinson-hyperlegible-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">Glove<span>box</span></div>
+    <div class="sub">Living in your car, planned</div>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- PLAN -->
+  <section class="view" id="v-plan" aria-labelledby="t-plan">
+    <h1 id="t-plan" class="sr-only">Plan</h1>
+
+    <div class="card install" id="installCard" hidden>
+      <div class="install-row">
+        <img src="icons/icon-192.png" alt="" width="44" height="44">
+        <div><b>Install Glovebox</b><p class="small muted" id="installTxt">Add it to your home screen. It works with no signal.</p></div>
+      </div>
+      <div class="install-actions">
+        <button class="btn" id="installBtn" hidden>Install</button>
+        <button class="btn ghost" id="installDismiss">Not now</button>
+      </div>
+    </div>
+
+    <div class="card" id="setup">
+      <h2>Tell us about your move</h2>
+      <p class="muted small">This tailors your checklist and safety tips. It stays on this phone only.</p>
+      <label class="field" for="moveDate">Move-out date<input type="date" id="moveDate"></label>
+      <div class="field"><span class="field-lbl" id="lbl-vehicle">Vehicle</span>
+        <div class="chips" data-key="vehicle" role="group" aria-labelledby="lbl-vehicle">
+          <button class="chip" data-val="sedan">Sedan</button><button class="chip" data-val="suv">SUV / hatch</button><button class="chip" data-val="van">Minivan / van</button><button class="chip" data-val="truck">Pickup</button>
+        </div></div>
+      <div class="field"><span class="field-lbl" id="lbl-who">Who's coming</span>
+        <div class="chips" data-key="who" data-multi="1" role="group" aria-labelledby="lbl-who">
+          <button class="chip" data-val="partner">A partner</button><button class="chip" data-val="kids">Kids</button><button class="chip" data-val="pet">A pet</button>
+        </div></div>
+      <div class="field"><span class="field-lbl" id="lbl-climate">Climate this season</span>
+        <div class="chips" data-key="climate" role="group" aria-labelledby="lbl-climate">
+          <button class="chip" data-val="cold">Cold</button><button class="chip" data-val="mild">Mild</button><button class="chip" data-val="hot">Hot</button>
+        </div></div>
+    </div>
+
+    <div class="card">
+      <h3>Countdown</h3>
+      <div class="count"><b id="days">—</b><span class="muted" id="daysLbl">days until move-out</span></div>
+      <div class="bar" role="progressbar" aria-label="Checklist progress"><i id="overallBar"></i></div>
+      <p class="small muted" id="overallTxt"></p>
+    </div>
+
+    <div class="card">
+      <h3>Do these next</h3>
+      <div id="nextUp"></div>
+      <button class="btn ghost" data-go="check">See the full checklist</button>
+    </div>
+
+    <div class="card">
+      <h3>For your situation</h3>
+      <div id="tailoredTips" class="rows"></div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section class="view" id="v-check" hidden>
+    <div><h1>Move-out checklist</h1><p class="muted small">Grouped by when to do it. Items marked <span class="flag flag-inline">safety</span> matter most.</p></div>
+    <div id="phases" class="rows rows-lg"></div>
+  </section>
+
+  <!-- BUDGET -->
+  <section class="view" id="v-budget" hidden>
+    <div><h1>Rent vs. car life</h1><p class="muted small">Monthly costs. Example figures are filled in. Replace them with yours.</p></div>
+    <div class="card"><h3>Now: housing</h3><div class="rows" id="bNow"></div></div>
+    <div class="card"><h3>After: living in the car</h3><div class="rows" id="bCar"></div></div>
+    <div class="card">
+      <div class="compare">
+        <div class="stat"><span class="small muted">Housing / mo</span><b id="tNow">$0</b></div>
+        <div class="stat"><span class="small muted">Car life / mo</span><b id="tCar">$0</b></div>
+      </div>
+      <div class="verdict" id="verdict" aria-live="polite"></div>
+      <p class="small muted" id="saveGoal"></p>
+    </div>
+  </section>
+
+  <!-- TONIGHT -->
+  <section class="view" id="v-night" hidden>
+    <div><h1>Tonight's routine</h1><p class="muted small" id="nightDate"></p></div>
+    <div class="card">
+      <div class="bar" role="progressbar" aria-label="Routine progress"><i id="nightBar"></i></div>
+      <div id="nightList"></div>
+      <button class="btn ghost" id="nightReset">Start a new night</button>
+    </div>
+    <div class="card">
+      <h3>Choosing a spot</h3>
+      <div class="rows" id="spotTips"></div>
+    </div>
+  </section>
+
+  <!-- HELP -->
+  <section class="view" id="v-help" hidden>
+    <div><h1>Help lines</h1><p class="muted small">Free and confidential.</p></div>
+    <div class="card card-flush" id="hotlines"></div>
+    <div class="card">
+      <h3>Worth looking into</h3>
+      <div class="rows small">
+        <p><b>Rapid rehousing and rental assistance.</b> Ask 211 whether you qualify. Some programs can help before you leave your home.</p>
+        <p><b>SNAP and Lifeline phone service.</b> You can usually apply without a fixed address. <a href="https://www.benefits.gov" target="_blank" rel="noopener">benefits.gov</a></p>
+        <p><b>Libraries.</b> Free wifi, charging, restrooms and a quiet place to work during the day.</p>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Your data</h3>
+      <p class="small muted">Everything you enter stays on this phone only. Nothing is sent anywhere.</p>
+      <button class="btn ghost" id="wipe">Clear my data</button>
+      <div class="confirm" id="wipeConfirm" hidden>
+        <p class="small"><b>Clear everything? This can't be undone.</b></p>
+        <div class="install-actions"><button class="btn danger" id="wipeYes">Yes, clear it</button><button class="btn ghost" id="wipeNo">Cancel</button></div>
+      </div>
+    </div>
+    <p class="small muted center" id="versionTxt"></p>
+  </section>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<div class="update" id="updateBar" hidden>
+  <span>A new version of Glovebox is ready.</span>
+  <button class="btn" id="updateBtn">Update</button>
+</div>
+
+<nav class="tabs" aria-label="Sections">
+  <button data-go="plan" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>Plan</button>
+  <button data-go="check"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>Checklist</button>
+  <button data-go="budget"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v20M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Budget</button>
+  <button data-go="night"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 13A9 9 0 1 1 11 3a7 7 0 0 0 10 10z"/></svg>Tonight</button>
+  <button data-go="help"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>Help</button>
+</nav>
+
+<script src="app.js" defer></script>
+</body>
+</html>
