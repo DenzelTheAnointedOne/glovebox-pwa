@@ -6,7 +6,7 @@ Works on current iPhones (iOS 16.4+) and Android phones. Plain HTML, CSS and Jav
 ## Features
 
 - **Plan:** move-out date, vehicle, who's coming and climate. Shows a countdown, the next three tasks and tips for the situation.
-- **Checklist:** 19 tasks grouped from 3–4 weeks out through the first month. Safety items are flagged.
+  "See the full checklist" expands that card to all 19 tasks, grouped from 3–4 weeks out through the first month, with the next three tagged and safety items flagged.
 - **Budget:** compares housing costs with car-life costs and estimates how long it takes to save a move-in fund.
 - **Tonight:** a nightly safety routine that resets each day, plus tips on choosing where to park.
 - **Help:** 211, 988, the domestic violence hotline and 911, with Call, Text and Copy buttons.
@@ -40,6 +40,8 @@ python3 -m http.server 8080      # or: npx serve .
 
 Open http://localhost:8080. To test on a phone, deploy it (below), because phones need HTTPS.
 
+## Deploy (any static HTTPS host)
+
 **GitHub Pages:** push this folder to a repo, then go to Settings → Pages → Deploy from a branch → `main` / root.
 Your app will be at `https://<username>.github.io/<repo>/`. All paths are relative, so a subfolder URL works.
 
@@ -63,3 +65,9 @@ If you add a new file, also add it to the `SHELL` list in `sw.js` so it's availa
 - On iOS, push notifications only work after the app is added to the home screen (iOS 16.4+). This version doesn't use them yet.
 - Safari can clear website data for sites you haven't used in a while. Home-screen apps are exempt, so encourage users to install.
 - Call and Text buttons use `tel:` and `sms:` links, which open the phone and Messages apps.
+
+## Next steps
+
+- Map of safe parking lots, gyms, showers and libraries
+- Optional account with cloud sync so data moves between devices
+- Reminder notifications for the nightly routine and morning check-in

@@ -1,6 +1,6 @@
 // Glovebox service worker: caches the app shell so it works with no signal.
 // Bump VERSION whenever you change any file listed in SHELL.
-const VERSION = "glovebox-v1.0.0";
+const VERSION = "glovebox-v1.1.0";
 const SHELL = [
   "./",
   "./index.html",

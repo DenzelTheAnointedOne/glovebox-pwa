@@ -1,5 +1,5 @@
 "use strict";
-const APP_VERSION = "1.0.0";
+const APP_VERSION = "1.1.0";
 
 /* ================= Content ================= */
 const PHASES = [
@@ -129,11 +129,11 @@ function daysLeft() {
   return Math.round((d - n) / 864e5);
 }
 
-function itemHTML([k, t, w, f], prefix) {
+function itemHTML([k, t, w, f], prefix, upNext) {
   const on = !!S.done[k];
   return `<label class="item${on ? " checked" : ""}" for="${prefix}-${k}">
     <input type="checkbox" id="${prefix}-${k}" data-k="${k}" ${on ? "checked" : ""}>
-    <div><strong>${esc(t)}${f ? '<span class="flag">safety</span>' : ""}</strong><span class="why">${esc(w)}</span></div></label>`;
+    <div><strong>${esc(t)}${upNext ? '<span class="up-next">Next</span>' : ""}${f ? '<span class="flag">safety</span>' : ""}</strong><span class="why">${esc(w)}</span></div></label>`;
 }
 
 function renderPlan() {
@@ -152,16 +152,22 @@ function renderPlan() {
   $("#overallBar").style.width = (n / ALL.length) * 100 + "%";
   $("#overallTxt").textContent = `${n} of ${ALL.length} checklist items done`;
   const next = ALL.filter((i) => !S.done[i[0]]).slice(0, 3);
-  $("#nextUp").innerHTML = next.length ? next.map((i) => itemHTML(i, "n")).join("") : '<p class="muted">Every item is done. Check your nightly routine.</p>';
+  const nextIds = new Set(next.map((i) => i[0]));
+  $("#nextCount").textContent = fullOpen ? `${n}/${ALL.length} done` : "";
+  $("#nextUp").hidden = fullOpen;
+  $("#fullList").hidden = !fullOpen;
+  $("#toggleFull").textContent = fullOpen ? "Show only what's next" : "See the full checklist";
+  $("#toggleFull").setAttribute("aria-expanded", fullOpen);
+  if (fullOpen) {
+    $("#fullList").innerHTML = PHASES.map((p) => {
+      const d = p.items.filter((i) => S.done[i[0]]).length, all = d === p.items.length;
+      return `<div class="phase"><div class="phase-head"><h2>${p.name}</h2><span class="tag${all ? " done" : ""}">${d}/${p.items.length}</span></div>
+        <div>${p.items.map((i) => itemHTML(i, "c", nextIds.has(i[0]))).join("")}</div></div>`;
+    }).join("");
+  } else {
+    $("#nextUp").innerHTML = next.length ? next.map((i) => itemHTML(i, "n")).join("") : '<p class="muted">Every item is done. Check your nightly routine.</p>';
+  }
   $("#tailoredTips").innerHTML = tailored(S).map(([c, t]) => `<div class="tip ${c}">${esc(t)}</div>`).join("");
-}
-
-function renderCheck() {
-  $("#phases").innerHTML = PHASES.map((p) => {
-    const d = p.items.filter((i) => S.done[i[0]]).length, all = d === p.items.length;
-    return `<div class="card phase"><div class="phase-head"><h2>${p.name}</h2><span class="tag${all ? " done" : ""}">${d}/${p.items.length}</span></div>
-      <div>${p.items.map((i) => itemHTML(i, "c")).join("")}</div></div>`;
-  }).join("");
 }
 
 function costRows(el, obj, labels, grp) {
@@ -201,12 +207,15 @@ function renderHelp() {
 }
 
 /* ================= Navigation ================= */
-const VIEWS = ["plan", "check", "budget", "night", "help"];
+const VIEWS = ["plan", "budget", "night", "help"];
+let fullOpen = false; // full checklist expanded on the Plan page
 function go(v, push = true) {
+  // Old links to the checklist page open the Plan page with the full list expanded.
+  if (v === "check") { v = "plan"; fullOpen = true; }
   if (!VIEWS.includes(v)) v = "plan";
   $$(".view").forEach((s) => (s.hidden = s.id !== "v-" + v));
   $$("nav.tabs button").forEach((b) => (b.dataset.go === v ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current")));
-  ({ plan: renderPlan, check: renderCheck, budget: renderBudget, night: renderNight, help: renderHelp })[v]();
+  ({ plan: renderPlan, budget: renderBudget, night: renderNight, help: renderHelp })[v]();
   if (push) history.replaceState(null, "", "#" + v);
   window.scrollTo(0, 0);
 }
@@ -232,8 +241,7 @@ document.addEventListener("click", (e) => {
 document.addEventListener("change", (e) => {
   const t = e.target;
   if (t.dataset.k && t.type === "checkbox") {
-    S.done[t.dataset.k] = t.checked; save();
-    if (!$("#v-plan").hidden) renderPlan(); else renderCheck();
+    S.done[t.dataset.k] = t.checked; save(); renderPlan();
   }
   if (t.dataset.n !== undefined) { rollNight(); S.night[t.dataset.n] = t.checked; save(); renderNight(); }
   if (t.id === "moveDate") { S.moveDate = t.value; save(); renderPlan(); }
@@ -242,6 +250,11 @@ document.addEventListener("input", (e) => {
   const t = e.target;
   if (t.dataset.g) { S[t.dataset.g][t.dataset.k] = +t.value || 0; save(); totals(); }
 });
+$("#toggleFull").onclick = () => {
+  fullOpen = !fullOpen; renderPlan();
+  // Keep the card in view when it grows or shrinks.
+  $("#toggleFull").closest(".card").scrollIntoView({ block: "start", behavior: "smooth" });
+};
 $("#nightReset").onclick = () => { S.night = {}; S.nightDay = today(); save(); renderNight(); };
 $("#wipe").onclick = () => { $("#wipeConfirm").hidden = false; $("#wipe").hidden = true; };
 $("#wipeNo").onclick = () => { $("#wipeConfirm").hidden = true; $("#wipe").hidden = false; };
